@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galectin-3｜AI 製藥流程教學</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect rx='8' width='32' height='32' fill='%230f5e57'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23f4efe6' font-size='16' font-family='serif'%3EG%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">跳到內容</a>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="mark">G3</span> Galectin-3 製藥流程</a>
+    <nav>
+      <a href="#steps">二十個步驟</a>
+      <a href="quiz.html">闖關遊戲</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div>
+      <p class="kicker">分子生物學課程 · 單機網頁</p>
+      <h1>用 Galectin-3 走一遍 AI 製藥。</h1>
+      <p class="lede">Galectin-3 是一個會辨認 β-半乳糖的凝集素。它的醣辨識區又淺又極性，很適合拿來練習：結構怎麼讀、口袋怎麼定、藥效團怎麼寫、藥庫與模型怎麼建、docking 分數為什麼不能單獨相信，以及設計完之後還要經過合成評估、細胞、動物、專利與臨床。</p>
+      <div class="hero-actions">
+        <a class="btn" href="#s1">從蛋白開始</a>
+        <a class="btn secondary" href="quiz.html">20 關 · 每關 3 題</a>
+      </div>
+      <div class="meta-row">
+        <div><strong>靶點</strong>人源 Galectin-3，基因 LGALS3</div>
+        <div><strong>設計主線</strong>CRD 的 subsite A–E</div>
+        <div><strong>文獻</strong>資料夾中的 J. Med. Chem. 2026 論文</div>
+      </div>
+    </div>
+    <div class="hero-card">
+      <p class="kicker">先摸一下結合溝</p>
+      <div class="groove" id="groove">
+        <button type="button" data-site="A"><strong>A</strong><small>遠端</small></button>
+        <button type="button" data-site="B"><strong>B</strong><small>Arg144</small></button>
+        <button type="button" class="active" data-site="C"><strong>C</strong><small>半乳糖</small></button>
+        <button type="button" data-site="D"><strong>D</strong><small>第二個糖</small></button>
+        <button type="button" data-site="E"><strong>E</strong><small>Arg186</small></button>
+      </div>
+      <p class="pocket-copy" id="pocketCopy">Subsite C 是半乳糖的主辨識位。乳糖或 N-乙醯乳糖胺結合時，半乳糖坐在這裡，旁邊的葡萄糖或 N-乙醯葡萄糖胺伸向 subsite D。</p>
+    </div>
+  </section>
+
+  <main id="main" class="wrap">
+    <div class="phase" id="steps"><span>PHASE 01 · 靶點</span><b>先搞清楚蛋白，再談篩選</b></div>
+
+    <article class="step" id="s1">
+      <div class="num">01</div>
+      <div class="panel">
+        <h2>Galectin-3 是什麼</h2>
+        <p>Galectin 是一群能辨認 β-D-半乳糖苷的可溶性凝集素。人的 Galectin-3 由 <b>LGALS3</b> 編碼，UniProt 編號 <b>P17931</b>，成熟蛋白大約 250 個胺基酸。它是這個家族裡唯一的 chimeric 成員：N 端是一段富含脯胺酸與甘胺酸、像膠原蛋白的重複區，負責寡聚化；C 端才是大約 130 個胺基酸的 carbohydrate-recognition domain，簡稱 <b>CRD</b>。</p>
+        <div class="grid-3">
+          <div class="tile"><b>細胞外</b>以 CRD 結合細胞表面與基質上的 β-半乳糖苷，影響黏附、免疫細胞與纖維化訊號。</div>
+          <div class="tile"><b>細胞內</b>也存在於細胞質與細胞核，部分功能不依賴醣。這點會直接影響後面接下來的藥物能不能打中你想打的功能。</div>
+          <div class="tile"><b>臨床上已在用的身分</b>血清 Galectin-3 是心衰竭的預後生物標記。它同時是標的，也是會升降的指標，解讀時不能把兩件事混成一件。</div>
+        </div>
+        <p class="callout">這份網頁把後續設計都收斂在 <b>細胞外 CRD 的醣結合溝</b>。如果疾病機制其實來自細胞內、不靠醣的功能，再強的醣模擬物也不會回答那個問題。</p>
+      </div>
+    </article>
+
+    <article class="step" id="s2">
+      <div class="num">02</div>
+      <div class="panel">
+        <h2>結構：一條分為 A 到 E 的溝</h2>
+        <p>CRD 是一個 β 三明治。結合溝被習慣分成 <b>subsite A、B、C、D、E</b>。這個分法最早來自 galectin-9 與五糖的結合，後來被用在整個 galectin 家族。入門晶體結構是 PDB <b>1A3K</b>：人源 Galectin-3 CRD 與 N-乙醯乳糖胺。</p>
+        <div class="grid-2">
+          <div class="tile"><b>Subsite C 不可替換</b>半乳糖的羥基在這裡形成氫鍵網絡。常用來核對的殘基包括 His158、Asn160、Arg162、Asn174、Glu184，以及與糖環做 CH–π 堆疊的 <b>Trp181</b>。葡萄糖幾乎無法扮演這個角色。</div>
+          <div class="tile"><b>Subsite D 比較寬容</b>乳糖的葡萄糖、LacNAc 的 N-乙醯葡萄糖胺，或硫代雙半乳糖苷的另一個半乳糖，都可以坐在這裡。半乳糖與葡萄糖在 D 的角色比較能互換。</div>
+        </div>
+        <p>溝的兩側才是親和力被拉高的地方。Subsite B 靠近 <b>Arg144</b>，subsite E 靠近 <b>Arg186</b>。資料夾裡那篇 2026 年的藥物化學論文，就是在證明：取代基可以被有意識地送到 B 或送到 E，而不是靠 docking 分數碰運氣。</p>
+      </div>
+    </article>
+
+    <article class="step" id="s3">
+      <div class="num">03</div>
+      <div class="panel">
+        <h2>和疾病的關係</h2>
+        <div class="grid-3">
+          <div class="tile"><b>纖維化</b>肺、肝、心、腎都有文獻把 Galectin-3 和巨噬細胞、成纖維細胞活化連在一起。特發性肺纖維化與代謝功能障礙相關脂肪性肝炎（MASH，舊稱 NASH）都曾被選為臨床適應症。</div>
+          <div class="tile"><b>心衰竭</b>血清濃度用來輔助預後，不代表抑制它就會改善心衰竭。生物標記和藥物標的要分開寫進計畫。</div>
+          <div class="tile"><b>胰臟癌</b>胰臟導管腺癌常可見 Galectin-3 表現上升，並被聯想到基質、轉移與 T 細胞功能受抑制。這是本頁後段動物實驗選胰臟癌的理由，但它不是已經被臨床證明的適應症。</div>
+        </div>
+        <p class="callout gold">選適應症時要寫清楚假說：你要阻斷的是細胞外凝集素功能，還是腫瘤免疫排除，還是器官纖維化。假說會決定後面接的是吸入、口服、單用還是併用免疫檢查點抑制劑。</p>
+      </div>
+    </article>
+
+    <div class="phase"><span>PHASE 02 · 現況</span><b>已有的抑制劑告訴你哪裡難</b></div>
+
+    <article class="step" id="s4">
+      <div class="num">04</div>
+      <div class="panel">
+        <h2>已經有的抑制劑</h2>
+        <p>天然配體很弱。乳糖多半在毫莫耳等級；硫代雙半乳糖苷（thiodigalactoside, TDG）進到數十微莫耳；真正被做成候選藥物的，是在雙糖兩側再長出芳香取代基。</p>
+        <table>
+          <thead><tr><th>分子</th><th>類型</th><th>教學上要記住的事</th></tr></thead>
+          <tbody>
+            <tr><td>乳糖、LacNAc</td><td>天然雙糖</td><td>只佔 subsite C+D，親和力不足以當藥，適合作為碎片起點。</td></tr>
+            <tr><td>TDG</td><td>C2 對稱的硫苷雙半乳糖</td><td>兩個半乳糖都能坐進 C。翻轉 180° 後交互作用相同。</td></tr>
+            <tr><td>GB0139（TD139）</td><td>TDG 兩側接芳香基，吸入給藥</td><td>論文中的配體 7。對 Galectin-3 CRD 是低奈米莫耳。Galecto 的 IPF 試驗未達標。</td></tr>
+            <tr><td>GB1211</td><td>可口服的小分子 Galectin-3 抑制劑</td><td>正在與 pembrolizumab 併用，測黑色素瘤與頭頸鱗癌。</td></tr>
+            <tr><td>Belapectin（GR-MD-02）</td><td>多醣，靜脈輸注</td><td>同時認識 galectin-3 與 galectin-1，開發方向是 MASH 肝硬化。</td></tr>
+          </tbody>
+        </table>
+        <p>論文用螢光偏振測到的解離常數大致是：硫代乳糖 180 μM、TDG 58 μM、單側芳香基的雙糖約 0.7–1.3 μM、兩側都有芳香基的配體 7（GB0139）11 nM、不對稱的配體 8 為 13 nM。葡萄糖加上同一個芳香基（配體 2）即使到 400 μM 仍測不到結合。半乳糖這個辨識元素不能省。</p>
+        <div class="bars" id="bars"></div>
+        <p class="callout">從 TDG 的 58 μM 到 GB0139 的 11 nM，親和力大約提升五千倍。提升來自兩側芳香基與 subsite B、E 的接觸，不是把糖換掉。</p>
+      </div>
+    </article>
+
+    <article class="step" id="s5">
+      <div class="num">05</div>
+      <div class="panel">
+        <h2>臨床試驗走到哪裡</h2>
+        <p>狀態會變。下面整理到 2026 年 10 月，正式數字以 ClinicalTrials.gov 與原始公告為準。</p>
+        <table>
+          <thead><tr><th>試驗</th><th>設計</th><th>結果與意義</th></tr></thead>
+          <tbody>
+            <tr><td>GALACTIC-1<br>NCT03832946</td><td>吸入 GB0139 3 mg，對照安慰劑，52 週，對象是未用標準抗纖維化藥的 IPF。</td><td>2023 年 8 月公布未達主要終點（FVC 下降速率）。GB0139 組平均下降 316.6 mL，安慰劑 127.4 mL。兩組的 galectin-3 都上升，沒有證實標的佔有。開發中止。</td></tr>
+            <tr><td>NCT05913388</td><td>口服 GB1211 併用 pembrolizumab，對照 pembrolizumab 加安慰劑。對象是轉移性黑色素瘤與頭頸鱗癌。第二期。</td><td>登錄狀態為進行中、不再招募。它說明一個方向：Galectin-3 抑制劑被拿來搭配免疫治療，而不是單藥包打纖維化。</td></tr>
+            <tr><td>NAVIGATE<br>NCT04365868</td><td>Belapectin 靜脈給藥，對象是尚未有食道靜脈曲張的 MASH 肝硬化。</td><td>依登錄資料，試驗在 2026 年進入原訂第三期之前停止，已收集的 18 個月資料改以 2b 期分析。主要終點沒有達標。開發公司其後另規劃一項第三期，數字與設計以最新登錄為準。</td></tr>
+          </tbody>
+        </table>
+        <p class="callout rust">奈米莫耳親和力沒有保護 GALACTIC-1。給藥路徑、標的佔有、病人是否已在用其他藥、以及終點選得對不對，都可以讓一個強結合分子停下來。</p>
+      </div>
+    </article>
+
+    <article class="step" id="s6">
+      <div class="num">06</div>
+      <div class="panel">
+        <h2>製藥挑戰</h2>
+        <div class="grid-2">
+          <div class="tile"><b>口袋淺、極性高</b>CRD 暴露在溶劑中。親和力要靠很多氫鍵，這些氫鍵在水裡本來就有競爭。分子容易又大又極性。</div>
+          <div class="tile"><b>五規則會誤殺</b>Lipinski 規則是為一般口服小分子寫的。醣模擬物 TPSA 高、氫鍵多，直接用規則刪除，會把 TDG 這一整類起點刪光。</div>
+          <div class="tile"><b>家族選擇性</b>Galectin-1 和其他成員的 CRD 摺疊相似。只寫「抑制 Galectin-3」卻不測 Galectin-1，無法判斷是選擇性藥物還是家族抑制劑。</div>
+          <div class="tile"><b>細胞內與細胞外</b>醣模擬物主要競爭細胞外的醣結合。疾病若依賴細胞內功能，體外 Kd 再好也不會變成療效。</div>
+          <div class="tile"><b>構型不唯一</b>對稱的 TDG 可以以兩個方向結合。分數只給一個 pose 時，你可能在優化一個實驗裡只佔一半人口的方向。</div>
+          <div class="tile"><b>標的佔有</b>GALACTIC-1 裡血液中的 galectin-3 沒有下降。沒有佔有的證據時，臨床失敗無法歸因到「生物學不對」或「藥沒到」。 </div>
+        </div>
+      </div>
+    </article>
+
+    <div class="phase"><span>PHASE 03 · 計算設計</span><b>對著 CRD 做篩選，而不是對著整顆蛋白</b></div>
+
+    <article class="step" id="s7">
+      <div class="num">07</div>
+      <div class="panel">
+        <h2>針對 CRD 的篩選策略</h2>
+        <p>不要從隨機的類藥庫開始。Galectin-3 的已知配體告訴你，合格分子幾乎都保留 β-半乳糖那個辨識元素，再往 B 與 E 生長。一條適合課程實作的路線是：</p>
+        <div class="flow">
+          <div><strong>1</strong>選 CRD 複合物，優先用有配體的結構，而不是空蛋白。</div>
+          <div><strong>2</strong>把口袋寫成 subsite A–E，並標出 Trp181 與 Arg144、Arg186。</div>
+          <div><strong>3</strong>用半乳糖、乳糖、TDG、硫代乳糖當碎片核心建立聚焦庫。</div>
+          <div><strong>4</strong>Docking 時加上交互作用約束，再用實驗或自由能計算重排。</div>
+        </div>
+        <p>論文實際做的是這條路線的結構版：他們沒有盲篩，而是合成一組只差在「糖核心是否對稱、芳香基在哪一側」的類似物，再用核磁共振看每個分子坐進哪一個 subsite。</p>
+      </div>
+    </article>
+
+    <article class="step" id="s8">
+      <div class="num">08</div>
+      <div class="panel">
+        <h2>怎麼定義 binding pocket</h2>
+        <p>Binding pocket 不是「蛋白質表面上看起來凹的地方」，而是<b>配體真正接觸、而且那些接觸會影響親和力的殘基集合</b>。</p>
+        <div class="grid-2">
+          <div class="tile"><b>以配體為中心</b>取 PDB 1A3K 或抑制劑共晶，選距離共晶配體 4–5 Å 以內的殘基。這是 Galectin-3 最不容易走偏的定義。</div>
+          <div class="tile"><b>以幾何演算法為輔</b>fpocket、CASTp、DoGSiteScorer、Schrödinger SiteMap 可以提出候選凹槽。淺溝常常被排得很後面，所以演算法結果要回共晶結構核對。</div>
+        </div>
+        <p>定義完成後請把它分成可作業的區塊，而不是一個大球：C 是半乳糖錨點，D 是第二個糖，B 與 E 是可設計的取代基口袋，A 在雙糖配體裡常常是空的。Docking 盒子要蓋住整條溝，但又不要大到讓糖漂到蛋白質背面。</p>
+        <p class="callout">若手邊只有空的 CRD，先把乳糖或 TDG 對回去，或改用有配體的結構。空口袋的側鏈方向，尤其是精胺酸，不一定等於結合狀態。</p>
+      </div>
+    </article>
+
+    <article class="step" id="s9">
+      <div class="num">09</div>
+      <div class="panel">
+        <h2>Pharmacophore：結合所需要的特徵</h2>
+        <p>藥效團不是分子圖，而是一組必須在空間中同時出現的化學特徵。對這個 CRD，最少要寫下五件事：</p>
+        <div class="grid-3">
+          <div class="tile"><b>半乳糖羥基的氫鍵</b>對準 subsite C。少一兩個還可能結合，整個模式換成葡萄糖就會失敗，配體 2 就是這個對照。</div>
+          <div class="tile"><b>糖環的非極性面</b>朝向 Trp181，形成 CH–π。Docking 若把糖環翻面，分數再好也要淘汰。</div>
+          <div class="tile"><b>β 糖苷鍵</b>第二個糖往 subsite D。α 連結會把第二個糖指到錯誤方向。</div>
+          <div class="tile"><b>往 B 或 E 的芳香特徵</b>靠近 Arg144 或 Arg186。這是從微莫耳走到奈米莫耳的位置。</div>
+          <div class="tile"><b>方向選擇</b>對稱骨架會讓同一個取代基有時在 B、有時在 E。不對稱骨架才能指定方向。</div>
+          <div class="tile"><b>排除特徵</b>取代基不可撞進 Trp181 或把半乳糖擠離 subsite C。藥效團要寫「不能出現」的區域，不只寫「希望出現」的區域。</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="step" id="s10">
+      <div class="num">10</div>
+      <div class="panel">
+        <h2>依文獻做 fragment-based 設計</h2>
+        <p>經典的片段篩選是：收集符合「三規則」的小碎片，用核磁共振、表面電漿共振或晶體學找出弱結合者，再把碎片長大或接在一起。Galectin-3 不適合從完全隨機的碎片庫開始，因為口袋在等一個很特定的半乳糖。</p>
+        <p>Habanová 等人（J. Med. Chem. 2026, 69, 21164–21180）把這件事做成一個可教學的模型。核心只有兩個雙糖：<b>硫代雙半乳糖苷</b>有一條穿過硫原子的 C2 對稱軸；<b>硫代乳糖</b>沒有。兩者都能佔住 C 與 D，但翻轉之後命運不同。</p>
+        <div class="sym-lab">
+          <div class="sym-card">
+            <h3>對稱 · TDG</h3>
+            <div class="sites" id="sitesTdg">
+              <div>B<em>可接芳香基</em></div>
+              <div>C<em>Gal</em></div>
+              <div>D<em>Gal</em></div>
+              <div>E<em>可接芳香基</em></div>
+            </div>
+            <button class="btn secondary" type="button" id="flipTdg">翻轉 180°</button>
+            <p id="msgTdg">翻轉前後是同一個熱力學狀態。雙側都有取代基時，分子會同時面對 B 與 E，你無法指定只修飾其中一側。</p>
+          </div>
+          <div class="sym-card">
+            <h3>不對稱 · 硫代乳糖</h3>
+            <div class="sites" id="sitesLac">
+              <div>B<em>取代基方向</em></div>
+              <div>C<em>Gal</em></div>
+              <div>D<em>Glc</em></div>
+              <div>E<em>另一側</em></div>
+            </div>
+            <button class="btn secondary" type="button" id="flipLac">翻轉 180°</button>
+            <p id="msgLac">葡萄糖不能佔住 subsite C，所以翻轉被罰分。取代基因此可以只被送到 B，或只被送到 E。</p>
+          </div>
+        </div>
+        <p>他們在糖上安裝帶氟的芳香三唑，讓 <sup>19</sup>F NMR 分辨取代基落在 B（約 −113.6 ppm）還是 E（約 −112.9 到 −113.4 ppm）。蛋白質 NMR 也對得上：配體 4 擾動 Arg144 一帶，配體 6 主要擾動 Ile171 與 Gln187。結合熱量學則用 FPA 與 ITC，兩者的 Kendall τ 為 0.94。ITC 顯示結合由焓驅動，熵是不利的。</p>
+        <p>OpenFE 的自由能微擾和實驗親和力相關（對 ITC 的 R² 為 0.84，對 FPA 為 0.86），但高估了單芳香基化合物對 subsite B 的偏好。兩個 pose 並存所能賺到的構型熵，上限大約是 RT ln 2，在 298 K 約 0.41 kcal/mol。所以改用不對稱骨架，不會因為「少了一種結合方向」而付出很大的親和力代價。</p>
+        <p class="callout gold">片段長大的順序可以記成：半乳糖錨在 C → 加上第二個糖佔 D → 只在需要的那一側加芳香基。每長一步都要用結合實驗與構型實驗接受或拒絕，而不是只看結構圖好不好看。</p>
+      </div>
+    </article>
+
+    <article class="step" id="s11">
+      <div class="num">11</div>
+      <div class="panel">
+        <h2>怎麼建立藥庫</h2>
+        <div class="grid-2">
+          <div class="tile"><b>聚焦庫，而不是全宇宙</b>以乳糖、LacNAc、TDG、硫代乳糖列舉 B 與 E 兩側的取代基。這是最有機會命中 CRD 的庫。</div>
+          <div class="tile"><b>已知活性當種子</b>ChEMBL、BindingDB 裡已標註 Galectin-3 的分子，用來學習哪些側鏈曾經成功，也用來檢查你的庫有沒有和舊藥過於相像。</div>
+          <div class="tile"><b>負例要故意留下</b>論文的配體 2（葡萄糖版本）不結合。訓練或評估時如果只有強結合分子，模型會學不會「失去半乳糖就失敗」。</div>
+          <div class="tile"><b>過濾要換一套</b>可以移除 PAINS、反應性過高與顯然無法合成的結構。不要用口服五規則直接刪除高 TPSA 的醣。分子量、溶解度與選擇性仍然要記錄，只是門檻要依這個標的重設。</div>
+        </div>
+        <p>庫裡每個分子最好帶著標註：核心是對稱還是不對稱、芳香基預期落在 B 還是 E、是否保留 β-半乳糖。這些標註會讓後面的 docking 失敗可以被解釋，而不是只剩下一欄分數。</p>
+      </div>
+    </article>
+
+    <article class="step" id="s12">
+      <div class="num">12</div>
+      <div class="panel">
+        <h2>怎麼訓練模型</h2>
+        <p>先決定模型要預測什麼。對這個題目，有用的任務是：這個分子還認不認 subsite C、親和力大概落在哪個級數、以及它比較像坐進 B 還是 E。不要一開始就訓練「能不能治胰臟癌」。</p>
+        <div class="grid-3">
+          <div class="tile"><b>資料</b>公開的 Galectin-3 活性加上你自己的聚焦庫標籤。同一篇論文、同一種測定的 Kd 才能放在同一個迴歸裡。FPA 與 ITC 可以互相對照，不宜不經換算就混成一個數字。</div>
+          <div class="tile"><b>切分</b>依糖核心切分。若 TDG 類似物同時出現在訓練集與測試集，準確度會好看，換一個新骨架就失效。</div>
+          <div class="tile"><b>模型層級</b>指紋或圖神經網路適合做初篩排序。構型與親和力的細分，論文使用的是 OpenFE 自由能計算，而不是再訓練一個更大的黑盒。</div>
+        </div>
+        <p class="callout">這篇論文就是一個現成的失敗教材：自由能計算和實驗親和力的相關不差，pose 的人口比例仍然算錯。模型可以進流程，不能取代 <sup>19</sup>F NMR、蛋白質化學位移或共晶。</p>
+      </div>
+    </article>
+
+    <article class="step" id="s13">
+      <div class="num">13</div>
+      <div class="panel">
+        <h2>Docking 可以用哪些軟體</h2>
+        <table>
+          <thead><tr><th>工具</th><th>角色</th><th>用在 Galectin-3 時要注意</th></tr></thead>
+          <tbody>
+            <tr><td>AutoDock Vina、Vina-GPU</td><td>開源初篩</td><td>速度快，適合課程把整庫跑過。對淺而極性的溝，分數解析度有限。</td></tr>
+            <tr><td>GNINA</td><td>以卷積網路重新評分</td><td>可把 Vina 的 pose 再排一次。仍要用 Trp181 與 subsite C 檢查。</td></tr>
+            <tr><td>DOCK6</td><td>學術用的錨點與成長</td><td>概念上接近片段長大，適合從半乳糖錨點長出去。</td></tr>
+            <tr><td>Glide、GOLD、MOE</td><td>藥物化學常用的商業套件</td><td>可以強制氫鍵或疏水面朝向 Trp181。約束比換軟體更重要。</td></tr>
+            <tr><td>DiffDock、共摺疊模型</td><td>由人工智慧直接出 pose</td><td>高極性的醣不是它們最穩的題目。沒有對回 1A3K 或抑制劑共晶之前，不能採用。</td></tr>
+            <tr><td>OpenFE</td><td>自由能，不是 docking</td><td>論文用來計算每一個 pose 的結合自由能。相關性好，仍會偏置 B。</td></tr>
+          </tbody>
+        </table>
+        <p>實務上的最小組合是：一個會產生 pose 的 docking 程式，加上你手寫的交互作用檢查，再加上一種獨立的實驗。多裝幾個程式不會自動讓答案變正確。</p>
+      </div>
+    </article>
+
+    <article class="step" id="s14">
+      <div class="num">14</div>
+      <div class="panel">
+        <h2>怎麼解釋 docking 結果</h2>
+        <p>分數是排序用的，不是解離常數。下面這張清單可以對著每一個你想留下的 pose 勾一次。硫代乳糖如果被放成「葡萄糖在 C、半乳糖在 D」，直接淘汰，不必進入自由能計算。</p>
+        <ul class="checklist" id="check">
+          <li><label><input type="checkbox"> 半乳糖坐在 subsite C，而不是 D 或溝的外面。</label></li>
+          <li><label><input type="checkbox"> 糖環的非極性面朝向 Trp181。</label></li>
+          <li><label><input type="checkbox"> His158、Asn160、Arg162、Asn174、Glu184 這組氫鍵沒有整組消失。</label></li>
+          <li><label><input type="checkbox"> 第二個糖以 β 連結指向 subsite D。</label></li>
+          <li><label><input type="checkbox"> 芳香基的位置和骨架對稱性一致：對稱分子才允許 B 與 E 兩個方向並存。</label></li>
+          <li><label><input type="checkbox"> 分數不是只獎勵芳香環的接觸、同時犧牲半乳糖氫鍵。</label></li>
+          <li><label><input type="checkbox"> 另一個程式或另一組約束得到相同的 subsite 佔用。</label></li>
+        </ul>
+        <p id="checkMsg">勾完 7 項，這個 pose 才值得拿去跟 FPA、ITC 或 NMR 比較。</p>
+        <p class="callout">論文裡 FEP 把單芳香基配體的 B 方向判得太好，實驗卻看到 B 與 E 差不多。所以「更貴的計算」仍然是假說。構型的標準答案在光譜與晶體，不在分數最低的那一行。</p>
+      </div>
+    </article>
+
+    <article class="step" id="s15">
+      <div class="num">15</div>
+      <div class="panel">
+        <h2>篩選之後的藥物設計</h2>
+        <p>Docking 或生成模型交出名單之後，設計才開始。這一靶點比較可靠的做法，是把骨架鎖住，只生成或只列舉取代基。</p>
+        <div class="grid-2">
+          <div class="tile"><b>鎖住的部分</b>β-半乳糖必須留在能滿足 subsite C 的形式。第二個糖決定你要對稱的 TDG，還是能指定方向的硫代乳糖。</div>
+          <div class="tile"><b>可以改的部分</b>指向 B 或指向 E 的芳香基。論文用 3-氟苯基三唑同時滿足結合與 NMR 報導；正式設計可以換成其他芳香環，但要重新證明方向沒有翻掉。</div>
+        </div>
+        <p>生成式工具，例如以口袋為條件的擴散模型，或 REINVENT 這一類在骨架上長取代基的程式，適合放在這一步。請把它們的輸出當成新的藥庫，重新做第 14 步的檢查。生成模型很常為了看起來像藥而拿掉醣上的羥基，那會直接丟掉 subsite C。</p>
+        <p>留下分子時同時看四欄：預測或實測的親和力、對 Galectin-1 的選擇性、水溶性，以及下一步逆合成給的可及性。只按 docking 分數排序，會把無法合成、或只是黏在 Trp181 上的芳香分子排到最上面。</p>
+      </div>
+    </article>
+
+    <div class="phase"><span>PHASE 04 · 實驗</span><b>算完要合成，合成完要證明它真的在結合</b></div>
+
+    <article class="step" id="s16">
+      <div class="num">16</div>
+      <div class="panel">
+        <h2>逆合成軟體：評估能不能做，而不是取得實驗步驟</h2>
+        <p>逆合成是從目標分子往回推，看它能不能由可購買的砌塊組出來。對醣模擬物，關鍵難點通常是 β 糖苷鍵的立體化學，以及羥基要不要保護，而不是找出一個會動的碳–碳鍵就結束。</p>
+        <table>
+          <thead><tr><th>工具</th><th>你可以拿它做什麼</th></tr></thead>
+          <tbody>
+            <tr><td>AiZynthFinder</td><td>開源。適合把一整個聚焦庫的合成可及性先排一次。</td></tr>
+            <tr><td>ASKCOS</td><td>由麻省理工發展的路線規劃，可看建議的砌塊與反應類型。</td></tr>
+            <tr><td>IBM RXN for Chemistry</td><td>由反應資料預測可能的單步轉換，用來檢查某一個斷鍵合不合理。</td></tr>
+            <tr><td>Synthia</td><td>商業路線設計，常被藥化團隊用來比較多條全合成。</td></tr>
+            <tr><td>Spaya、Molecule.one、PostEra Manifold</td><td>偏重可購買砌塊與委託合成的可及性。</td></tr>
+          </tbody>
+        </table>
+        <p>用法是：把候選物變成 SMILES，看程式是否找得到保留 β 立體化學的路線、砌塊貴不貴、步驟會不會比論文裡那組類似物更長。排完之後交給會做醣化學的人判斷。軟體的第一名路線不是實驗配方。論文本身也示範了另一種選擇：配體 7（GB0139）是買來的對照，其他類似物才自己合成。不一定每一個對照分子都要從頭做。</p>
+      </div>
+    </article>
+
+    <article class="step" id="s17">
+      <div class="num">17</div>
+      <div class="panel">
+        <h2>細胞與體外：親和力、效價、藥效</h2>
+        <div class="grid-3">
+          <div class="tile"><b>親和力 Affinity</b>平衡時有多緊。用解離常數 Kd。論文的標準組合是螢光偏振與等温滴定量熱。ITC 還能拆成 ΔH 與 −TΔS。這一系列結合是焓驅動。</div>
+          <div class="tile"><b>效價 Potency</b>要多濃才達到一半效果，例如競爭實驗的 IC50。IC50 會隨探針濃度改變，不能直接寫成 Kd。</div>
+          <div class="tile"><b>藥效 Efficacy</b>效果的最大值。一個分子可以親和力很高，但在細胞裡因為進不去、被蛋白質吸附，或只阻斷細胞外功能，最大生物效果仍然很小。</div>
+        </div>
+        <p>建議的順序是：先用 FPA 把庫排成弱、中、強；對最有興趣的幾個做 ITC，確認化學計量接近 1:1，而且緩衝液改變時焓沒有跟著大變（論文以此說明結合沒有淨的質子轉移）；再用 <sup>19</sup>F 或蛋白質 NMR 確認取代基在 B 還是 E。然後才進細胞。</p>
+        <p>細胞實驗要對著假說選，而不是只報一個存活率。若假說是免疫調節，看 T 細胞功能；若假說是腫瘤細胞行為，看遷移；若假說是纖維化，看成纖維細胞的活化標記。Galectin-3 的細胞外功能可以用重組蛋白加上細胞表面的醣來重建；只加化合物、不提供這個結合事件，陰性結果無法解釋。</p>
+        <p class="callout">三個詞不要互換。GB0139 對純化 CRD 是奈米莫耳親和力，吸入後仍沒有在 IPF 試驗證明臨床藥效。中間缺的是標的佔有和疾病終點，不是再多一個 docking 分數。</p>
+      </div>
+    </article>
+
+    <article class="step" id="s18">
+      <div class="num">18</div>
+      <div class="panel">
+        <h2>動物模式：為什麼用胰臟癌</h2>
+        <p>這裡選胰臟導管腺癌，是因為 Galectin-3 在這個腫瘤裡常被連到基質與免疫排除，而且臨床上已經有人把 Galectin-3 抑制劑拿去搭配 PD-1 抗體。動物實驗要回答的是這條假說，不是「腫瘤會不會變小一點點」。</p>
+        <div class="flow">
+          <div><strong>體外</strong>先在胰臟癌細胞確認你測的是遷移、訊號或免疫相關讀值，而不是一般毒性。</div>
+          <div><strong>異種移植</strong>人源細胞種進免疫缺陷鼠，容易量體積，但看不到 T 細胞。</div>
+          <div><strong>原位</strong>種進胰臟，解剖位置比較接近疾病，手術與定量都更難。</div>
+          <div><strong>免疫完整</strong>同基因瘤或 KPC 這類模式，才對得上「解除免疫排除」的假說。</div>
+        </div>
+        <p>讀值可以包括腫瘤負荷、存活、CD8 T 細胞是否進入腫瘤、以及基質標記。血清 Galectin-3 可以當伴隨數據，但不能單獨當成標的佔有，GALACTIC-1 已經示範過它會誤導。抑制劑若是針對人的 CRD 設計，要另外確認它認不認鼠的 Galectin-3。</p>
+        <p class="callout gold">模式由假說決定。只做裸鼠皮下瘤，無法支持一個免疫假說。動物實驗也必須走實驗動物委員會與 3R，網頁不提供劑量或操作流程。</p>
+      </div>
+    </article>
+
+    <div class="phase"><span>PHASE 05 · 轉譯</span><b>專利與臨床要跟設計同時想</b></div>
+
+    <article class="step" id="s19">
+      <div class="num">19</div>
+      <div class="panel">
+        <h2>專利檢索</h2>
+        <p>論文公開不等於你可以商業使用。TDG 雙芳香基、GB0139、GB1211、belapectin 各自有申請人與權利範圍。開始列舉大庫之前就該搜，否則很容易設計出一個已經被主張的骨架。</p>
+        <div class="grid-2">
+          <div class="tile"><b>去哪裡搜</b>Espacenet、Google Patents、WIPO PatentScope、USPTO、Lens.org。用英文：galectin-3、LGALS3、thiodigalactoside、TD139、GB0139、GB1211、belapectin、GR-MD-02。</div>
+          <div class="tile"><b>記什麼</b>專利家族、到期日、國家、申請人，以及請求項保護的是化合物、組成，還是某一種用途（例如肺纖維化或胰臟癌）。</div>
+        </div>
+        <p>可專利性問的是「你的分子新不新、相對於舊分子有沒有非顯而易見的效果」。自由實施問的是「你做出來會不會踩到別人的請求項」。兩件事都要做。學術上引用論文、重現一個已知抑制劑來當對照，和要把新分子推進商業開發，是不同的判斷。</p>
+      </div>
+    </article>
+
+    <article class="step" id="s20">
+      <div class="num">20</div>
+      <div class="panel">
+        <h2>臨床試驗怎麼規劃</h2>
+        <p>假設候選物是一個新的口服 CRD 抑制劑，假說是：在轉移性胰臟癌中，阻斷細胞外 Galectin-3 可以讓免疫治療更容易作用。規劃時先寫目標產品輪廓，再寫期別。</p>
+        <table>
+          <thead><tr><th></th><th>要先寫死的內容</th></tr></thead>
+          <tbody>
+            <tr><td>目標產品輪廓</td><td>口服、對 Galectin-3 優於或至少不同於 Galectin-1、能夠和標準治療或 PD-1 抗體併用、有一個可測的標的佔有指標。</td></tr>
+            <tr><td>進入人體之前</td><td>純化蛋白的 Kd、細胞裡對得上假說的藥效、免疫完整動物的方向性結果、安全性與暴露量。沒有這些，不討論期別。</td></tr>
+            <tr><td>第一期</td><td>晚期實體瘤，可以包含胰臟癌。主要看安全性與藥物動力學，並事先定義什麼叫做標的佔有。不要用「血清 Galectin-3 升高」反過來證明藥已經結合。</td></tr>
+            <tr><td>第二期</td><td>轉移性胰臟癌，隨機比較標準治療與標準治療加抑制劑，或免疫治療與免疫治療加抑制劑。主要終點用客觀反應率或無進展存活，並用 Galectin-3 高表現做探索性分層。</td></tr>
+          </tbody>
+        </table>
+        <p>GALACTIC-1 的教訓要寫進計畫：親和力、給藥路徑和終點是三件獨立的事；沒有標的佔有時，陰性結果不能解釋。NAVIGATE 的教訓是：終點（食道靜脈曲張）一旦選錯或效應不夠，整個適應症故事會停在 2b 期。黑色素瘤與頭頸癌的 GB1211 試驗則提醒，Galectin-3 目前比較像併用夥伴，而不是單藥。</p>
+        <p class="callout">這是教學用的規劃骨架，不是臨床方案，也不能當作醫療建議。試驗登錄、終點與法規要求都以當下的主管機關文件為準。</p>
+      </div>
+    </article>
+
+    <section>
+      <h2>資料來源</h2>
+      <ol class="refs">
+        <li>Habanová, N. 等。Axial Symmetry Directs Ligand Orientation in Galectin-3。J. Med. Chem. 2026, 69, 21164–21180。DOI: 10.1021/acs.jmedchem.6c00031。檔案 jm6c00031.pdf，CC BY 4.0。親和力、對稱性、NMR 與 OpenFE 的敘述都來自這篇。</li>
+        <li>PDB 1A3K：人源 Galectin-3 CRD 與 N-乙醯乳糖胺。口袋殘基請以結構座標為準。</li>
+        <li>UniProt P17931，LGALS3。</li>
+        <li>ClinicalTrials.gov：NCT03832946、NCT05913388、NCT04365868。</li>
+        <li>Galecto 於 2023 年 8 月 15 日公布的 GALACTIC-1 主要結果：未達 FVC 終點，並停止 GB0139 開發。</li>
+      </ol>
+      <p class="refs">本頁說明公開文獻中的製藥流程，用來上課。它不是操作規程，不提供合成條件、劑量或動物實驗步驟。</p>
+    </section>
+  </main>
+  <footer>Galectin-3 AI 製藥流程 · 離線開啟 index.html 即可 · <a href="quiz.html">到闖關遊戲</a></footer>
+  <script>
+    const sites = {
+      A: "Subsite A 在溝的遠端。乳糖通常碰不太到它。不要把雙糖配體的主要結合能算在 A 上。",
+      B: "Subsite B 靠近 Arg144。半乳糖若坐在 C，接在半乳糖 C3 的芳香基可以伸到這裡。論文中配體 4 的化學位移擾動集中在這一帶。",
+      C: "Subsite C 是半乳糖的主辨識位。乳糖或 N-乙醯乳糖胺結合時，半乳糖坐在這裡，旁邊的葡萄糖或 N-乙醯葡萄糖胺伸向 subsite D。",
+      D: "Subsite D 容納第二個糖。葡萄糖、N-乙醯葡萄糖胺或另一個半乳糖都可以。它比 C 寬容。",
+      E: "Subsite E 靠近 Arg186。不對稱骨架可以把芳香基單獨送到這裡。論文中配體 6 主要擾動 Ile171 與 Gln187。"
+    };
+    const groove = document.getElementById("groove");
+    const pocketCopy = document.getElementById("pocketCopy");
+    groove.addEventListener("click", (event) => {
+      const button = event.target.closest("button");
+      if (!button) return;
+      groove.querySelectorAll("button").forEach((item) => item.classList.remove("active"));
+      button.classList.add("active");
+      pocketCopy.textContent = sites[button.dataset.site];
+    });
+
+    const series = [
+      ["配體 2 · 葡萄糖", 3.4, ">400 μM"],
+      ["硫代乳糖", 3.74, "180 μM"],
+      ["TDG", 4.24, "58 μM"],
+      ["配體 1 · 單糖", 4.57, "27 μM"],
+      ["配體 5", 5.89, "1.3 μM"],
+      ["配體 6", 5.96, "1.1 μM"],
+      ["配體 4", 6.0, "1.0 μM"],
+      ["配體 3", 6.14, "0.73 μM"],
+      ["配體 8", 7.89, "13 nM"],
+      ["GB0139 · 配體 7", 7.96, "11 nM"]
+    ];
+    const bars = document.getElementById("bars");
+    series.forEach(([name, pkd, label]) => {
+      const row = document.createElement("div");
+      row.className = "bar-row";
+      row.innerHTML = "<span></span><div class='track'><span></span></div><span class='kd'></span>";
+      row.children[0].textContent = name;
+      row.children[1].firstElementChild.style.width = (pkd / 8.4 * 100) + "%";
+      row.children[2].textContent = label;
+      bars.appendChild(row);
+    });
+
+    function wireFlip(buttonId, sitesId, messageId, messages) {
+      const button = document.getElementById(buttonId);
+      const board = document.getElementById(sitesId);
+      const message = document.getElementById(messageId);
+      button.addEventListener("click", () => {
+        const flipped = board.classList.toggle("flipped");
+        message.textContent = flipped ? messages[1] : messages[0];
+      });
+    }
+    wireFlip("flipTdg", "sitesTdg", "msgTdg", [
+      "翻轉前後是同一個熱力學狀態。雙側都有取代基時，分子會同時面對 B 與 E，你無法指定只修飾其中一側。",
+      "翻轉之後仍然是兩個半乳糖對著 C 與 D。對稱骨架沒有辦法用「翻面會壞掉」來鎖定單一方向。"
+    ]);
+    wireFlip("flipLac", "sitesLac", "msgLac", [
+      "葡萄糖不能佔住 subsite C，所以翻轉被罰分。取代基因此可以只被送到 B，或只被送到 E。",
+      "翻轉後葡萄糖被送到 C。這個方向缺少半乳糖的氫鍵與 Trp181 堆疊，實驗與計算都不支持它成為主要 pose。"
+    ]);
+
+    const boxes = document.querySelectorAll("#check input");
+    const checkMsg = document.getElementById("checkMsg");
+    boxes.forEach((box) => box.addEventListener("change", () => {
+      const done = [...boxes].filter((item) => item.checked).length;
+      checkMsg.textContent = done === boxes.length
+        ? "七項都符合。下一步是拿去跟 FPA、ITC 或 NMR 比較，而不是直接宣稱它是藥物。"
+        : "已勾 " + done + " / 7。沒勾到的那幾項，就是這個 pose 還不能相信的理由。";
+    }));
+  </script>
+</body>
+</html>

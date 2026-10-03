@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>闖關｜Galectin-3 製藥流程</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect rx='8' width='32' height='32' fill='%230f5e57'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23f4efe6' font-size='16' font-family='serif'%3EG%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="mark">G3</span> Galectin-3 製藥流程</a>
+    <nav>
+      <a href="index.html">回教學頁</a>
+      <button class="btn secondary" type="button" id="reset">重設進度</button>
+    </nav>
+  </header>
+  <main class="quiz-shell">
+    <p class="kicker">闖關 · 20 步 × 3 題</p>
+    <h1>每一步都要答對兩題才能前進。</h1>
+    <p class="lede">題目對應教學頁的二十個步驟。答錯會看到理由。進度存在這台電腦的瀏覽器裡。</p>
+    <div class="stats">
+      <div><b id="statCleared">0 / 20</b>已過關</div>
+      <div><b id="statStars">0 / 60</b>累計答對的最好成績</div>
+    </div>
+    <div class="map" id="map"></div>
+    <section class="qcard" id="stage" hidden></section>
+  </main>
+  <script>
+    const LEVELS = [
+      { title: "認識蛋白", href: "index.html#s1", questions: [
+        { q: "人的 Galectin-3 由哪個基因編碼？", options: ["LGALS3", "EGFR", "TP53", "INS"], a: 0, why: "基因是 LGALS3，UniProt 編號 P17931。" },
+        { q: "它在 galectin 家族裡屬於哪一種架構？", options: ["只有一個 CRD 的 prototype", "兩個 CRD 串在一起的 tandem-repeat", "N 端膠原樣重複區加上一個 CRD 的 chimeric", "七次穿膜受體"], a: 2, why: "Galectin-3 是人類這個家族裡唯一的 chimeric 成員。" },
+        { q: "這份教學把藥物設計收斂在哪一種功能？", options: ["細胞核裡的基因剪接", "細胞外 CRD 對 β-半乳糖苷的結合", "粒線體電子傳遞鏈", "胰島素受體的激酶活性"], a: 1, why: "後續的口袋、藥效團與醣模擬物都是針對細胞外的醣結合溝。細胞內、不依賴醣的功能不在這條設計線上。" }
+      ]},
+      { title: "蛋白結構", href: "index.html#s2", questions: [
+        { q: "乳糖結合時，半乳糖主要坐在哪個 subsite？", options: ["A", "B", "C", "E"], a: 2, why: "半乳糖在 subsite C，第二個糖伸向 D。" },
+        { q: "與半乳糖環做 CH–π 堆疊的殘基是？", options: ["Trp181", "血紅素的鐵", "只有 Arg186", "N 端的脯胺酸重複"], a: 0, why: "Trp181 是 subsite C 的堆疊殘基。Arg144 與 Arg186 分別靠近 B 與 E。" },
+        { q: "入門時建議打開的晶體結構是？", options: ["PDB 1A3K，CRD 與 N-乙醯乳糖胺", "一張沒有座標的卡通圖", "空的細胞核結構", "胰島素六聚體"], a: 0, why: "1A3K 是人源 Galectin-3 CRD 與 LacNAc 的複合物，適合用來定義口袋。" }
+      ]},
+      { title: "與疾病的關係", href: "index.html#s3", questions: [
+        { q: "血清 Galectin-3 在臨床上最成熟的用途是？", options: ["心衰竭的預後生物標記", "血型鑑定", "細菌藥敏試驗", "骨密度診斷"], a: 0, why: "它是心衰竭的預後標記。標記濃度改變，不等於藥物已經結合 CRD。" },
+        { q: "教學頁為什麼把胰臟癌放進後段的動物模式？", options: ["因為 Galectin-3 常被聯想到胰臟導管腺癌的基質與免疫排除", "因為這個蛋白就是胰島素", "因為胰臟癌已經有核准的 Galectin-3 單藥", "因為胰臟不含這個蛋白"], a: 0, why: "這是假說與文獻關聯，不是已經被臨床證明的適應症。" },
+        { q: "選適應症時最先要寫清楚的是？", options: ["你要阻斷細胞外凝集素、免疫排除，還是器官纖維化", "分子式裡有幾個碳", "公司股票代碼", "溶劑是水還是 DMSO"], a: 0, why: "假說會決定給藥路徑，以及要單用還是併用免疫治療。" }
+      ]},
+      { title: "已知抑制劑", href: "index.html#s4", questions: [
+        { q: "GB0139 對應論文中的哪一個分子？", options: ["配體 2，葡萄糖芳香基", "配體 7，兩側都有芳香基的 TDG", "未取代的乳糖", "Belapectin"], a: 1, why: "配體 7 就是 GB0139，也叫 TD139，FPA 的 Kd 約 11 nM。" },
+        { q: "配體 2 的實驗結果說明什麼？", options: ["葡萄糖加上同一個芳香基仍然不結合", "任何糖都一樣有效", "芳香基單獨就決定全部親和力", "ITC 不能測雙糖"], a: 0, why: "到 400 μM 仍測不到。半乳糖這個辨識元素不能省。" },
+        { q: "從 TDG（58 μM）到 GB0139（11 nM），親和力主要多在哪裡？", options: ["兩側芳香基與 subsite B、E 的接觸", "把半乳糖換成葡萄糖", "把分子量降到 100 以下", "除去所有氫鍵"], a: 0, why: "大約五千倍的提升來自溝兩側的芳香基，不是更換糖核心。" }
+      ]},
+      { title: "臨床試驗現況", href: "index.html#s5", questions: [
+        { q: "GALACTIC-1 的主要終點結果是？", options: ["未達 FVC 下降速率，GB0139 停止開發", "已取得 IPF 的上市許可", "證明吸入給藥一定有效", "試驗尚未開始"], a: 0, why: "2023 年 8 月的結果是 GB0139 組 FVC 下降更多，而且沒有證實標的佔有。" },
+        { q: "NCT05913388 在測試什麼組合？", options: ["口服 GB1211 併用 pembrolizumab", "GB0139 單藥治療 IPF", "抗生素與類固醇", "belapectin 點眼"], a: 0, why: "對象是轉移性黑色素瘤與頭頸鱗癌，代表 Galectin-3 抑制劑被拿來搭配免疫治療。" },
+        { q: "NAVIGATE 這項 belapectin 試驗後來怎麼了？", options: ["在進入原訂第三期階段前停止，18 個月資料改以 2b 期分析", "已經完成第三期並核准", "因為安全因素在第一位受試者前取消", "改成吸入給藥"], a: 0, why: "登錄說明試驗在 Stage 2 之前停止。主要終點沒有變成一個已成功的臨床故事。" }
+      ]},
+      { title: "製藥挑戰", href: "index.html#s6", questions: [
+        { q: "為什麼不能直接用 Lipinski 五規則刪藥庫？", options: ["醣模擬物又極性又多氫鍵，規則會把有效起點刪掉", "五規則只適用於抗體", "Galectin-3 不是蛋白質", "規則要求分子必須含金屬"], a: 0, why: "TDG 這類分子 TPSA 高，但仍是這個口袋的合理起點。" },
+        { q: "家族選擇性為什麼要單獨測？", options: ["其他 galectin 的 CRD 摺疊相似，可能一起被抑制", "因為細胞沒有細胞膜", "因為專利法禁止選擇性", "因為 ITC 只能測一種蛋白"], a: 0, why: "不測 Galectin-1，就不知道你做出的是選擇性分子還是家族抑制劑。" },
+        { q: "GALACTIC-1 對「標的佔有」的教訓是？", options: ["血液中的 galectin-3 沒有下降，失敗原因就無法判斷", "血清濃度上升就代表藥已經結合 CRD", "親和力高就不必測佔有", "只有第三期才需要生物標記"], a: 0, why: "兩組的 galectin-3 都上升。沒有佔有證據時，陰性試驗無法解釋。" }
+      ]},
+      { title: "CRD 篩選策略", href: "index.html#s7", questions: [
+        { q: "針對這個 CRD，較合理的起點是？", options: ["保留 β-半乳糖，再往 B 與 E 生長的聚焦庫", "完全隨機、不含糖的上市藥庫", "只篩選金屬錯合物", "只改 N 端膠原區的胜肽"], a: 0, why: "已知配體幾乎都保留半乳糖辨識元素。隨機類藥庫不是第一個庫。" },
+        { q: "Docking 盒子應該怎麼放？", options: ["蓋住整條 A–E 溝，但不要大到讓糖漂到蛋白背面", "包住整顆細胞", "只包 N 端重複區", "不要用實驗結構"], a: 0, why: "盒子要包含可設計的 B 與 E，同時避免無關表面。" },
+        { q: "論文的篩選比較接近哪一種？", options: ["依對稱性合成一小系列，再用 NMR 看 subsite", "盲篩一百萬個碎片且不做結合實驗", "只做動物試驗", "把蛋白水解成胺基酸"], a: 0, why: "他們比較的是糖核心對稱與否、芳香基在哪一側，不是無差別高通量。" }
+      ]},
+      { title: "Binding pocket", href: "index.html#s8", questions: [
+        { q: "定義口袋時最可靠的起點是？", options: ["共晶配體周圍約 4–5 Å 的殘基", "把整個蛋白表面都設成口袋", "只選看起來最凹、但沒有配體的洞", "隨機三個殘基"], a: 0, why: "以配體為中心，才是真正影響親和力的接觸。" },
+        { q: "fpocket 或 SiteMap 的結果應該怎麼用？", options: ["當成候選，再回共晶結構核對", "取代所有晶體結構", "只接受分數最高的凹槽，即使它不在 CRD", "用來預測臨床終點"], a: 0, why: "淺溝常被幾何演算法排得很後面，不能照單全收。" },
+        { q: "只有空的 CRD 結構時，比較穩的做法是？", options: ["改用有乳糖或抑制劑的複合物，或先把已知配體對回去", "直接相信空結構的所有精胺酸方向", "不定義口袋就開始生成分子", "把 N 端也放進同一個盒子"], a: 0, why: "空口袋的側鏈方向不一定等於結合狀態。" }
+      ]},
+      { title: "Pharmacophore", href: "index.html#s9", questions: [
+        { q: "藥效團指的是？", options: ["結合時必須在空間中同時出現的化學特徵", "分子的商品名", "一張合成反應式", "動物的存活曲線"], a: 0, why: "它不是分子圖本身，而是氫鍵、堆疊、方向與排除區的集合。" },
+        { q: "哪一個特徵最不能丟？", options: ["半乳糖在 subsite C 的氫鍵，以及朝向 Trp181 的非極性面", "任意一個芳香環", "正電荷金屬", "與 DNA 的共價鍵"], a: 0, why: "糖環翻面或換成葡萄糖，都會離開這個藥效團。" },
+        { q: "藥效團為什麼要寫排除區？", options: ["取代基不能把半乳糖擠離 subsite C，也不能撞上 Trp181", "因為軟體規定每張圖都要有紅色", "因為排除區可以取代實驗", "因為 A subsite 必須被塞滿"], a: 0, why: "只寫希望出現的芳香基，可能獎勵一個破壞錨點的分子。" }
+      ]},
+      { title: "Fragment 與文獻", href: "index.html#s10", questions: [
+        { q: "硫代雙半乳糖苷翻轉 180° 之後為什麼仍然成立？", options: ["兩個半乳糖使兩種方向變成同一個熱力學狀態", "因為葡萄糖可以佔 C", "因為硫原子會斷裂", "因為蛋白會變成二聚體"], a: 0, why: "C2 對稱讓翻轉前後的交互作用相同。這也使它無法指定取代基只去一側。" },
+        { q: "硫代乳糖為什麼能指定取代基的方向？", options: ["葡萄糖不能佔 subsite C，翻轉會被罰分", "因為它的分子量是零", "因為它不含氧", "因為 NMR 看不見氟"], a: 0, why: "不對稱骨架讓 B 與 E 不再等價。" },
+        { q: "OpenFE 自由能計算在論文裡的限制是？", options: ["和實驗親和力相關，但仍高估單芳香基配體對 subsite B 的偏好", "相關係數高，所以每個 pose 的人口都正確", "它取代了 FPA 與 ITC", "它無法計算雙糖"], a: 0, why: "對 ITC 的 R² 約 0.84，但 B 與 E 的人口和 NMR 不一致。" }
+      ]},
+      { title: "建立藥庫", href: "index.html#s11", questions: [
+        { q: "哪一種庫最適合當第一個篩選庫？", options: ["以乳糖、LacNAc、TDG、硫代乳糖列舉取代基", "只收集金屬有機骨架", "把所有高 TPSA 分子刪除後的上市藥", "隨機胜肽"], a: 0, why: "聚焦在已知會進入 C 與 D 的糖核心。" },
+        { q: "為什麼要把不結合的葡萄糖類似物留在庫裡？", options: ["沒有負例，模型學不會「失去半乳糖就失敗」", "因為負例可以拿來合成當藥物", "因為五規則要求一定要有葡萄糖", "因為 ITC 需要空白細胞"], a: 0, why: "配體 2 就是有用的負例。" },
+        { q: "每個分子最好額外標註什麼？", options: ["核心是否對稱、芳香基預期在 B 還是 E、是否保留 β-半乳糖", "只標顏色", "只標價格", "合成者的生日"], a: 0, why: "這些標註讓 docking 失敗可以被解釋。" }
+      ]},
+      { title: "訓練模型", href: "index.html#s12", questions: [
+        { q: "第一個模型比較值得預測的是？", options: ["還認不認 subsite C、親和力級數、取代基偏向 B 或 E", "能不能治癒胰臟癌", "病患的存活天數", "專利到期日"], a: 0, why: "臨床結果還沒有足夠且一致的標籤，不適合當第一個訓練目標。" },
+        { q: "資料應該怎麼切？", options: ["依糖核心切分，避免同一類 TDG 類似物同時在訓練與測試", "把同一系列打散以拉高分數", "不留測試集", "只訓練一個分子"], a: 0, why: "隨機切分會把幾乎相同的類似物漏到測試集。" },
+        { q: "FPA 與 ITC 的 Kd 能不能直接混成一個迴歸？", options: ["不適合。同一種測定放在一起，兩種方法用來互相對照", "可以，因為數字單位都是濃度", "只有在刪除負例之後可以", "ITC 的焓可以直接當成 FPA 的 Kd"], a: 0, why: "論文用它們互相確認，Kendall τ 為 0.94，但不是先加總再訓練。" }
+      ]},
+      { title: "Docking 軟體", href: "index.html#s13", questions: [
+        { q: "課程裡做整庫初篩，最容易取得的開源選擇是？", options: ["AutoDock Vina", "只能用臨床試驗登記系統", "只能用 Espacenet", "ITC 儀器本身"], a: 0, why: "Vina 適合產生 pose 與初步排序。淺溝上的分數解析度仍然有限。" },
+        { q: "OpenFE 在流程裡的位置是？", options: ["自由能計算，用來細分 pose，不是 docking 程式", "一種專利資料庫", "細胞存活試劑", "逆合成程式"], a: 0, why: "論文用它計算各 pose 的結合自由能，並和 ITC、FPA 比較。" },
+        { q: "DiffDock 或共摺疊模型的 pose 應該？", options: ["對回 1A3K 或抑制劑共晶之後才採用", "因為是 AI 產出，所以不必檢查 Trp181", "直接拿去申辦臨床", "只看置信分數"], a: 0, why: "高極性的醣不是這類模型最穩的題目。" }
+      ]},
+      { title: "解釋 docking", href: "index.html#s14", questions: [
+        { q: "硫代乳糖被放成葡萄糖在 C、半乳糖在 D 時？", options: ["淘汰。這和半乳糖必須佔 C 的證據相反", "分數好就留下", "把蛋白序列改成遷就配體", "改報成實驗 Kd"], a: 0, why: "分數不能推翻 subsite C 的專一性。" },
+        { q: "Docking 分數代表什麼？", options: ["用來排序的數字，不是解離常數", "ITC 的 ΔH", "臨床反應率", "專利請求項編號"], a: 0, why: "真的 Kd 來自 FPA、ITC 或同類結合實驗。" },
+        { q: "清單七項都符合之後，下一步是？", options: ["拿去跟 FPA、ITC 或 NMR 比較", "直接宣稱它是藥物", "停止所有實驗", "只再跑一次同一個程式"], a: 0, why: "檢查通過只代表 pose 值得驗證，不代表藥效。" }
+      ]},
+      { title: "篩選後的設計", href: "index.html#s15", questions: [
+        { q: "想把取代基只送到 B 或只送到 E，應鎖住哪一種骨架？", options: ["不對稱的硫代乳糖", "只能用完全對稱的 TDG", "純葡萄糖", "把半乳糖羥基全部移除"], a: 0, why: "對稱的 TDG 會讓兩個方向等價。葡萄糖則失去 subsite C。" },
+        { q: "生成模型若為了看起來像藥而拿掉醣上的羥基？", options: ["通常會丟掉 subsite C，應在檢查階段刪除", "一定更好，因為符合五規則", "代表它自動具有選擇性", "可以跳過 NMR"], a: 0, why: "生成物要重新進藥效團與 docking 檢查，不是終點。" },
+        { q: "留下候選物時，親和力旁邊至少還要看？", options: ["對 Galectin-1 的選擇性、水溶性、合成可及性", "只看分數最低", "只看分子圖好不好看", "只看是否含氟"], a: 0, why: "只按 docking 分數排序，會把無法合成或只黏住芳香環的分子留到最後。" }
+      ]},
+      { title: "逆合成", href: "index.html#s16", questions: [
+        { q: "逆合成軟體的產出應該被當成？", options: ["可及性與可能砌塊的評估，不是實驗配方", "可以直接照做的反應條件", "Kd 的測量值", "臨床試驗計畫"], a: 0, why: "路線要再由會做醣化學的人判斷，尤其是 β 立體化學。" },
+        { q: "哪一個是開源、適合先把整庫排過一輪的工具？", options: ["AiZynthFinder", "FPA 酶標儀", "ClinicalTrials.gov", "SiteMap"], a: 0, why: "AiZynthFinder 用來評估合成可及性。ASKCOS、IBM RXN、Synthia、Spaya 則是同一階段的其他選擇。" },
+        { q: "論文怎麼處理配體 7？", options: ["GB0139 是買來的對照，不是每一個對照都要從頭合成", "七個配體都必須用同一條最長路線", "軟體第一名路線即為實驗步驟", "對照分子不需要結構正確"], a: 0, why: "已知抑制劑可以購買來當對照，設計資源放在新的類似物。" }
+      ]},
+      { title: "親和力、效價、藥效", href: "index.html#s17", questions: [
+        { q: "Kd、IC50、最大效果分別對應？", options: ["親和力、效價、藥效", "三個詞完全同義", "都是動物存活率", "都是分子量"], a: 0, why: "Kd 是結合多緊，IC50 是多濃達到一半效果，藥效是效果最大能到多大。" },
+        { q: "論文用來互相確認親和力的兩種方法是？", options: ["螢光偏振與等温滴定量熱", "只有西方墨點", "血壓與體重", "專利引用數"], a: 0, why: "FPA 與 ITC 的排序高度一致，ITC 還能看到結合由焓驅動。" },
+        { q: "為什麼奈米莫耳 Kd 仍可能沒有細胞或臨床藥效？", options: ["還有通透性、蛋白吸附、細胞內功能與標的佔有", "因為 Kd 越低效果越小", "因為 FPA 不能在溶液中進行", "因為焓驅動的結合一定無活性"], a: 0, why: "GB0139 對純化 CRD 很緊，吸入 IPF 試驗仍然沒有臨床藥效。" }
+      ]},
+      { title: "胰臟癌動物模式", href: "index.html#s18", questions: [
+        { q: "若假說是解除免疫排除，哪一種模式比較對得上？", options: ["免疫系統完整的同基因瘤或 KPC", "只看試管裡的顏色", "只有裸鼠皮下瘤", "不需要對照組"], a: 0, why: "裸鼠皮下瘤容易量體積，但看不到 T 細胞，支持不了免疫假說。" },
+        { q: "血清 Galectin-3 在動物實驗裡適合？", options: ["當伴隨數據，不能單獨當成標的佔有", "取代腫瘤測量", "證明藥物已經結合 CRD", "取代實驗動物委員會審查"], a: 0, why: "GALACTIC-1 已顯示這個濃度會誤導。" },
+        { q: "針對人 CRD 設計的分子，進鼠模式前要額外確認？", options: ["它認不認鼠的 Galectin-3", "鼠的毛色", "分子是否一定含氟", "能不能省略所有對照"], a: 0, why: "人與鼠的 CRD 相似，但不代表每一個取代基都保留親和力。" }
+      ]},
+      { title: "專利檢索", href: "index.html#s19", questions: [
+        { q: "論文已經公開，代表？", options: ["可以引用來學習，不自動等於可以商業實施", "全世界都可以自由販售該分子", "專利因此失效", "不必再搜 GB0139"], a: 0, why: "學術公開與自由實施是兩件事。" },
+        { q: "可專利性與自由實施的差別是？", options: ["前者問你的發明新不新，後者問你會不會踩到別人的請求項", "兩者都只看分子重量", "前者只看動物實驗，後者只看顏色", "兩者都由 docking 分數決定"], a: 0, why: "請求項可能保護化合物，也可能保護某種用途。" },
+        { q: "適合開始搜尋的資料庫是？", options: ["Espacenet、Google Patents、PatentScope、USPTO、Lens", "只搜社群媒體", "只看 PDB", "只看 FPA 的原始檔"], a: 0, why: "關鍵字包含 galectin-3、LGALS3、TD139、GB0139、GB1211、belapectin。" }
+      ]},
+      { title: "臨床試驗規劃", href: "index.html#s20", questions: [
+        { q: "進入第一期之前，計畫裡應該已經有？", options: ["Kd、對得上假說的細胞藥效、免疫完整動物的方向，以及安全性與暴露量", "只有一張 docking 圖", "已經招募數百位胰臟癌病人", "上市價格"], a: 0, why: "期別是建立在這些證據之上，不是用來取代它們。" },
+        { q: "第一期最主要在看什麼？", options: ["安全性、藥物動力學，以及事先定義好的標的佔有", "直接比較總存活並申請核准", "只看血清 Galectin-3 是否升高", "只重複一次 docking"], a: 0, why: "血清 Galectin-3 升高不能被解讀成藥已經結合。" },
+        { q: "第二期若要呼應免疫假說，比較合理的設計是？", options: ["標準治療或免疫治療，隨機加上或不加抑制劑", "沒有對照的個案報告", "改回吸入 GB0139 的同一終點且不測佔有", "只收 Galectin-3 完全不表現的病人"], a: 0, why: "併用設計呼應 GB1211 試驗的方向，也避免把一個尚未證明的單藥說成標準治療。" }
+      ]}
+    ];
+
+    const storageKey = "gal3-quest-v1";
+    const saved = JSON.parse(localStorage.getItem(storageKey) || "{\"stars\":[]}");
+    const stars = Array.isArray(saved.stars) ? saved.stars : [];
+    while (stars.length < LEVELS.length) stars.push(0);
+
+    const map = document.getElementById("map");
+    const stage = document.getElementById("stage");
+    const statCleared = document.getElementById("statCleared");
+    const statStars = document.getElementById("statStars");
+    let active = -1;
+    let qIndex = 0;
+    let correct = 0;
+    let locked = false;
+
+    function clearedCount() { return stars.filter((n) => n >= 2).length; }
+    function persist() {
+      localStorage.setItem(storageKey, JSON.stringify({ stars }));
+      statCleared.textContent = clearedCount() + " / " + LEVELS.length;
+      statStars.textContent = stars.reduce((sum, n) => sum + n, 0) + " / " + (LEVELS.length * 3);
+    }
+    function unlocked(index) { return index === 0 || stars[index - 1] >= 2; }
+
+    function renderMap() {
+      map.innerHTML = "";
+      LEVELS.forEach((level, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "gate";
+        if (!unlocked(index)) button.classList.add("locked");
+        if (stars[index] >= 2) button.classList.add("cleared");
+        if (index === active) button.classList.add("current");
+        const status = !unlocked(index) ? "未解鎖" : stars[index] >= 2 ? "已過關 · " + stars[index] + "/3" : "可挑戰";
+        button.innerHTML = "<small>第 " + String(index + 1).padStart(2, "0") + " 關</small><strong></strong><small></small>";
+        button.children[1].textContent = level.title;
+        button.children[2].textContent = status;
+        button.disabled = !unlocked(index);
+        button.addEventListener("click", () => startLevel(index));
+        map.appendChild(button);
+      });
+      persist();
+    }
+
+    function startLevel(index) {
+      active = index;
+      qIndex = 0;
+      correct = 0;
+      locked = false;
+      stage.hidden = false;
+      renderMap();
+      renderQuestion();
+      stage.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function renderQuestion() {
+      const level = LEVELS[active];
+      const item = level.questions[qIndex];
+      stage.innerHTML = "";
+      const head = document.createElement("div");
+      head.innerHTML = "<div class='progress-pips' id='pips'></div>";
+      const title = document.createElement("h2");
+      title.textContent = "第 " + (active + 1) + " 關 · " + level.title;
+      const prompt = document.createElement("p");
+      prompt.textContent = "第 " + (qIndex + 1) + " / 3 題。 " + item.q;
+      stage.append(head, title, prompt);
+      const pips = head.querySelector("#pips");
+      for (let i = 0; i < 3; i += 1) {
+        const pip = document.createElement("i");
+        if (i <= qIndex) pip.className = "on";
+        pips.appendChild(pip);
+      }
+      const options = document.createElement("div");
+      options.className = "options";
+      item.options.forEach((text, optionIndex) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = text;
+        button.addEventListener("click", () => choose(optionIndex, button, options, item));
+        options.appendChild(button);
+      });
+      stage.appendChild(options);
+      const link = document.createElement("p");
+      const anchor = document.createElement("a");
+      anchor.href = level.href;
+      anchor.textContent = "回教學頁這一步";
+      link.appendChild(anchor);
+      stage.appendChild(link);
+    }
+
+    function choose(optionIndex, button, options, item) {
+      if (locked) return;
+      locked = true;
+      const ok = optionIndex === item.a;
+      if (ok) correct += 1;
+      [...options.children].forEach((node, index) => {
+        node.disabled = true;
+        if (index === item.a) node.classList.add("right");
+        if (index === optionIndex && !ok) node.classList.add("wrong");
+      });
+      const why = document.createElement("div");
+      why.className = "why";
+      why.textContent = (ok ? "答對。" : "這題不是這個答案。") + item.why;
+      const actions = document.createElement("div");
+      actions.className = "q-actions";
+      const next = document.createElement("button");
+      next.className = "btn";
+      next.type = "button";
+      next.textContent = qIndex === 2 ? "看本關結果" : "下一題";
+      next.addEventListener("click", () => {
+        if (qIndex === 2) finishLevel();
+        else { qIndex += 1; locked = false; renderQuestion(); }
+      });
+      actions.appendChild(next);
+      stage.append(why, actions);
+    }
+
+    function finishLevel() {
+      stars[active] = Math.max(stars[active], correct);
+      const passed = correct >= 2;
+      stage.innerHTML = "";
+      const title = document.createElement("h2");
+      title.textContent = passed ? "這一關通過了" : "這一關還差一點";
+      const text = document.createElement("p");
+      text.textContent = "答對 " + correct + " / 3。" + (passed ? "下一關已解鎖。" : "至少要 2 題才會解鎖下一關。");
+      const actions = document.createElement("div");
+      actions.className = "q-actions";
+      const retry = document.createElement("button");
+      retry.className = "btn secondary";
+      retry.type = "button";
+      retry.textContent = "再挑戰一次";
+      retry.addEventListener("click", () => startLevel(active));
+      actions.appendChild(retry);
+      if (passed && active < LEVELS.length - 1) {
+        const onward = document.createElement("button");
+        onward.className = "btn";
+        onward.type = "button";
+        onward.textContent = "進入下一關";
+        onward.addEventListener("click", () => startLevel(active + 1));
+        actions.appendChild(onward);
+      }
+      if (passed && active === LEVELS.length - 1 && clearedCount() === LEVELS.length) {
+        const done = document.createElement("p");
+        done.className = "callout";
+        done.textContent = "二十關都過了。回到論文 jm6c00031.pdf，把對稱骨架與不對稱骨架的 pose 再對一次。";
+        stage.append(title, text, done, actions);
+      } else stage.append(title, text, actions);
+      renderMap();
+    }
+
+    document.getElementById("reset").addEventListener("click", () => {
+      stars.fill(0);
+      active = -1;
+      stage.hidden = true;
+      renderMap();
+    });
+    renderMap();
+  </script>
+</body>
+</html>
